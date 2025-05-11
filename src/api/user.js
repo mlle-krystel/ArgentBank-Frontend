@@ -27,3 +27,19 @@ export async function getUserProfile(token) {
   // API renvoie un objet : { firstName, lastName, email, userName, ... }
   return data.body;
 }
+
+export async function updateUserName(token, newUserName) {
+  const response = await fetch("http://localhost:3001/api/v1/user/profile", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ userName: newUserName }),
+  });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Erreur modification");
+
+  return data.body;
+}

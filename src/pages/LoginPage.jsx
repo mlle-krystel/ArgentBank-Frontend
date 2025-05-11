@@ -4,8 +4,6 @@ import React, {useState} from "react";
 // useNavigate() = rediriger automatiquement contrairement à Link qui créer un lien cliquable
 import { useNavigate } from 'react-router-dom';
 import '../css/main.css';
-import Footer from "../components/Footer";
-import Navbar from "../components/Navbar.jsx";
 import { loginUser } from "../api/user";
 
 
@@ -42,7 +40,7 @@ function LoginPage() {
 
 return (
   <>
-    <Navbar />
+    
      <main className="main bg-dark">
       <section className="sign-in-content">
         <i className="fa fa-user-circle sign-in-icon"></i>
@@ -87,7 +85,7 @@ return (
         </form>
       </section>
     </main>
-    <Footer />
+   
   </>
 );
 

@@ -3,16 +3,15 @@ import '../css/main.css';
 import iconChat from '../img/icon-chat.png';
 import iconMoney from '../img/icon-money.png';
 import iconSecurity from '../img/icon-security.png';
-import Navbar from "../components/Navbar";
 
-import Footer from "../components/Footer";
+
 
 
 function Home() {
     return (
     <>
     
-     <Navbar />
+    
       <main>
         <div className="hero">
           <section className="hero-content">
@@ -53,7 +52,6 @@ function Home() {
         </section>
       </main>
 
-        <Footer />
     </>
   );
 }

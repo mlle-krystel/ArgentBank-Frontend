@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/main.css';
-import Navbar from '../components/Navbar.jsx';
-import Footer from '../components/Footer.jsx';
+
 import { getUserProfile } from "../api/user";
 
 
@@ -56,7 +55,7 @@ function UserProfil() {
 //   Si tout est bon, on affiche le profil utilisateur
   return (
     <>
-    <Navbar />
+   
     
       <main className="main bg-dark">
         <div className="header">
@@ -77,7 +76,7 @@ function UserProfil() {
       </section>
 
       
-        <Footer />
+       
     </>
   );
 }
