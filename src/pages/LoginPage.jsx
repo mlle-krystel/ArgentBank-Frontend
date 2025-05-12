@@ -3,8 +3,20 @@ import React, {useState} from "react";
 
 // useNavigate() = rediriger automatiquement contrairement à Link qui créer un lien cliquable
 import { useNavigate } from 'react-router-dom';
+
+// import { useDispatch } qui sert à dispatcher des actions Redux et {useSelector} qui sert à sélectionner une partie de l'état du store Redux
+import { useDispatch } from 'react-redux';
+
+// import {loginSuccess, loginFailure} from '../features/authSlice';
+import { loginSuccess } from "../features/authSlice";
+
 import '../css/main.css';
-import { loginUser } from "../api/user";
+
+
+
+// import { loginUser } from "../api/user"; plus utile car tout est directement fait dans le composant (fetch vers /login + /profile et dispatch vers Redux).
+
+
 
 
 function LoginPage() {
@@ -13,11 +25,16 @@ function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    // Message d'erreur à afficher si login échoue
-  const [error, setError] = useState("");
+    const [error, setError] = useState("");
+
+
 
 //   Fonction pour naviguer entre les pages
     const navigate = useNavigate();
+
+    // Fonction pour dispatcher les actions Redux
+    const dispatch = useDispatch();
+
 
 
 // handleSubmit = gérer la soumission du formulaire
@@ -25,18 +42,55 @@ function LoginPage() {
     const handleSubmit = async (e) => {
          // e.preventDefault() = empêcher le rechargement de la page
         e.preventDefault();
-       setError(""); // Réinitialiser l'erreur avant de soumettre le formulaire
+
 
         // try pour essayer de se connecter 
-       try {
-        const token = await loginUser(email, password);
-      localStorage.setItem("token", token); 
-        // Redirection vers la page de profil après la connexion réussie
-        navigate("/profile");
-    } catch (error) {
-        setError("Erreur de connexion");
+        try {
+      const response = await fetch("http://localhost:3001/api/v1/user/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+
+        // Récupérer la réponse du serveur
+      const data = await response.json();
+
+
+         // Si la connexion est réussie, on récupère le token et l'utilisateur
+       if (response.ok) {
+        const profileResponse = await fetch("http://localhost:3001/api/v1/user/profile", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${data.body.token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+          // Récupérer les données du profil utilisateur
+        const profileData = await profileResponse.json();
+
+        // Si la récupération du profil est réussie, on dispatch l'action loginSuccess et on redirige vers la page de profil
+          if (profileResponse.ok) {
+          dispatch(
+            loginSuccess({
+              token: data.body.token,
+              user: profileData.body,
+            })
+          );
+          navigate("/profile"); 
+       
+
+        } else {
+      setError("Impossible de récupérer le profil utilisateur");
     }
-        };
+  } else {
+    setError(data.message || "Email ou mot de passe incorrect");
+  }
+} catch (err) {
+  setError("Erreur serveur : " + err.message);
+}
+ };
 
 return (
   <>
