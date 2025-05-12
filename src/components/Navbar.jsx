@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../css/main.css";
-import logo from "../img/argentBankLogo.png";
+import logo from "../assets/img/argentBankLogo.webp";
 import { getUserProfile } from "../api/user";
 
 function Navbar() {

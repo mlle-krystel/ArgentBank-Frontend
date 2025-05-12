@@ -28,14 +28,9 @@ function UserProfil() {
   if (!user) return <p>Chargement...</p>;
 
 
-
-
-
-
   //   Si tout est bon, on affiche le profil utilisateur
   return (
     <>
-
 
       <main className="main bg-dark">
         <div className="header">

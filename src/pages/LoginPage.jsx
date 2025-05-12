@@ -1,5 +1,5 @@
 // useState = créer une boîte mémoire pour stocker des valeurs
-import React, {useState} from "react";
+import React, { useState } from "react";
 
 // useNavigate() = rediriger automatiquement contrairement à Link qui créer un lien cliquable
 import { useNavigate } from 'react-router-dom';
@@ -20,32 +20,32 @@ import '../css/main.css';
 
 
 function LoginPage() {
-    // useState = créer une boîte mémoire pour stocker des valeurs
-    // Champs saisis pour l'email et le mot de passe par l'utilisateur
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+  // useState = créer une boîte mémoire pour stocker des valeurs
+  // Champs saisis pour l'email et le mot de passe par l'utilisateur
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    const [error, setError] = useState("");
-
-
-
-//   Fonction pour naviguer entre les pages
-    const navigate = useNavigate();
-
-    // Fonction pour dispatcher les actions Redux
-    const dispatch = useDispatch();
+  const [error, setError] = useState("");
 
 
 
-// handleSubmit = gérer la soumission du formulaire
-    // (e) => { = fonction fléchée pour récupérer l'événement
-    const handleSubmit = async (e) => {
-         // e.preventDefault() = empêcher le rechargement de la page
-        e.preventDefault();
+  //   Fonction pour naviguer entre les pages
+  const navigate = useNavigate();
+
+  // Fonction pour dispatcher les actions Redux
+  const dispatch = useDispatch();
 
 
-        // try pour essayer de se connecter 
-        try {
+
+  // handleSubmit = gérer la soumission du formulaire
+  // (e) => { = fonction fléchée pour récupérer l'événement
+  const handleSubmit = async (e) => {
+    // e.preventDefault() = empêcher le rechargement de la page
+    e.preventDefault();
+
+
+    // try pour essayer de se connecter 
+    try {
       const response = await fetch("http://localhost:3001/api/v1/user/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -53,12 +53,12 @@ function LoginPage() {
       });
 
 
-        // Récupérer la réponse du serveur
+      // Récupérer la réponse du serveur
       const data = await response.json();
 
 
-         // Si la connexion est réussie, on récupère le token et l'utilisateur
-       if (response.ok) {
+      // Si la connexion est réussie, on récupère le token et l'utilisateur
+      if (response.ok) {
         const profileResponse = await fetch("http://localhost:3001/api/v1/user/profile", {
           method: "POST",
           headers: {
@@ -67,81 +67,81 @@ function LoginPage() {
           },
         });
 
-          // Récupérer les données du profil utilisateur
+        // Récupérer les données du profil utilisateur
         const profileData = await profileResponse.json();
 
         // Si la récupération du profil est réussie, on dispatch l'action loginSuccess et on redirige vers la page de profil
-          if (profileResponse.ok) {
+        if (profileResponse.ok) {
           dispatch(
             loginSuccess({
               token: data.body.token,
               user: profileData.body,
             })
           );
-          navigate("/profile"); 
-       
+          navigate("/profile");
+
 
         } else {
-      setError("Impossible de récupérer le profil utilisateur");
+          setError("Impossible de récupérer le profil utilisateur");
+        }
+      } else {
+        setError(data.message || "Email ou mot de passe incorrect");
+      }
+    } catch (err) {
+      setError("Erreur serveur : " + err.message);
     }
-  } else {
-    setError(data.message || "Email ou mot de passe incorrect");
-  }
-} catch (err) {
-  setError("Erreur serveur : " + err.message);
-}
- };
+  };
 
-return (
-  <>
-    
-     <main className="main bg-dark">
-      <section className="sign-in-content">
-        <i className="fa fa-user-circle sign-in-icon"></i>
-        <h1>Sign In</h1>
+  return (
+    <>
 
-        <form onSubmit={handleSubmit}>
-          <div className="input-wrapper">
-            <label htmlFor="email">Username</label>
-            <input
-              type="text"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="username"
-              required
-            />
-          </div>
+      <main className="main bg-dark">
+        <section className="sign-in-content">
+          <i className="fa fa-user-circle sign-in-icon"></i>
+          <h1>Sign In</h1>
 
-          <div className="input-wrapper">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              required
-            />
-          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="input-wrapper">
+              <label htmlFor="email">Username</label>
+              <input
+                type="text"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
+                required
+              />
+            </div>
 
-          <div className="input-remember">
-            <input type="checkbox" id="remember-me" />
-            <label htmlFor="remember-me">Remember me</label>
-          </div>
+            <div className="input-wrapper">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
+            </div>
 
-          {/* Message d'erreur affiché si besoin */}
-          {error && <p style={{ color: "red" }}>{error}</p>}
+            <div className="input-remember">
+              <input type="checkbox" id="remember-me" />
+              <label htmlFor="remember-me">Remember me</label>
+            </div>
 
-          <button className="sign-in-button" type="submit">
-            Sign In
-          </button>
-        </form>
-      </section>
-    </main>
-   
-  </>
-);
+            {/* Message d'erreur affiché si besoin */}
+            {error && <p style={{ color: "red" }}>{error}</p>}
+
+            <button className="sign-in-button" type="submit">
+              Sign In
+            </button>
+          </form>
+        </section>
+      </main>
+
+    </>
+  );
 
 }
 
