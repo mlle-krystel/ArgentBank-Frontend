@@ -1,16 +1,7 @@
+// Contient les fonctions d’appel réseau (fetch vers /profile)
 const API_URL = "http://localhost:3001/api/v1/user";
 
-export async function loginUser(email, password) {
-  const response = await fetch(`${API_URL}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message || "Erreur login");
-  return data.body.token;
-}
+// Récupère le profil utilisateur
 
 export async function getUserProfile(token) {
   const response = await fetch(`${API_URL}/profile`, {
@@ -24,12 +15,14 @@ export async function getUserProfile(token) {
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Erreur profil");
 
-  // API renvoie un objet : { firstName, lastName, email, userName, ... }
-  return data.body;
+  return data.body; // ex: { firstName, lastName, userName, ... }
 }
 
+/**
+ * Met à jour le pseudo de l'utilisateur
+ */
 export async function updateUserName(token, newUserName) {
-  const response = await fetch("http://localhost:3001/api/v1/user/profile", {
+  const response = await fetch(`${API_URL}/profile`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

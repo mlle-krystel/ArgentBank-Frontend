@@ -1,30 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux"; // Redux
+import { logout } from "../features/auth/auth.slice"; // action pour logout
 import "../css/main.css";
 import logo from "../assets/img/argentBankLogo.webp";
-import { getUserProfile } from "../api/user";
 
 function Navbar() {
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState(null);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
+  // On récupère le prénom depuis le store Redux (profil)
+  const firstName = useSelector((state) => state.profile?.firstName);
 
-    if (token) {
-      getUserProfile(token)
-        .then((data) => setFirstName(data.firstName))
-        .catch(() => {
-          // Si token invalide : on efface et on redirige
-          localStorage.removeItem("token");
-          setFirstName(null);
-        });
-    }
-  }, []);
+  const isAuthenticated = useSelector((state) => state.auth.token !== null);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
+    dispatch(logout()); // Vide le token et l'user
+    navigate("/"); // Redirection vers la home
   };
 
   return (
@@ -39,7 +31,7 @@ function Navbar() {
       </Link>
 
       <div>
-        {firstName ? (
+        {isAuthenticated ? (
           <>
             <span className="main-nav-item">
               <i className="fa fa-user-circle"></i> {firstName}
