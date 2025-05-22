@@ -1,54 +1,42 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import "../css/main.css";
+import UserEditMode from "../components/UserEditMode";
+
+
 
 function UserProfil() {
-  // user est la variable que tu as récupérée avec Redux
   const user = useSelector((state) => state.auth.user);
-
-  // Récupération du token depuis le store Redux
   const token = useSelector((state) => state.auth.token);
-
-  // Permet de rediriger l'utilisateur si besoin
   const navigate = useNavigate();
 
-  // useEffect = exécute une fonction après le premier rendu du composant ou après chaque mise à jour pour surveiller les changements
-  useEffect(() => {
-    if (!token) {
-      // Si pas de token, rediriger vers la page de connexion
-      navigate("/login");
-    }
-  }, [navigate, token]); // [navigate, token] = tableau de dépendances pour éviter les boucles infinies
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
-    /*
-        const token = localStorage.getItem("token");
+    if (!token) navigate("/login");
+  }, [navigate, token]);
 
-    // TODO deplacer dans la page profile, met à jour le state
-    if (token) {
-      getUserProfile(token)
-        .then((data) => setFirstName(data.firstName))
-        .catch(() => {
-          // Si token invalide : on efface et on redirige
-          localStorage.removeItem("token");
-          setFirstName(null);
-        });
-    }*/
-  }, []);
   if (!user) return <p>Chargement...</p>;
 
-  //   Si tout est bon, on affiche le profil utilisateur
   return (
     <>
       <main className="main bg-dark">
         <div className="header">
-          <h1>
-            Welcome back
-            <br />
-            {user.firstName} {user.lastName}!
-          </h1>
-          <button className="edit-button">Edit Name</button>
+          {!editMode ? (
+            <>
+              <h1>
+                Welcome back
+                <br />
+                {user.firstName} {user.lastName}!
+              </h1>
+              <button className="edit-button" onClick={() => setEditMode(true)}>
+                Edit Name
+              </button>
+            </>
+          ) : (
+            <UserEditMode setEditMode={setEditMode} />
+          )}
         </div>
       </main>
 

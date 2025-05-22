@@ -12,6 +12,8 @@ function Navbar() {
   // On récupère le prénom depuis le store Redux (profil)
   const firstName = useSelector((state) => state.profile?.firstName);
 
+  //  Ou si c'est le userName alors const userName = useSelector((state) => state.profile?.userName);
+
   const isAuthenticated = useSelector((state) => state.auth.token !== null);
 
   const handleLogout = () => {
@@ -35,8 +37,10 @@ function Navbar() {
           <>
             <span className="main-nav-item">
               <i className="fa fa-user-circle"></i> {firstName}
+              {/* ou <i className="fa fa-user-circle"></i> {userName}
+ */}
             </span>
-            <button
+            <button 
               onClick={handleLogout}
               className="main-nav-item"
               style={{ background: "none", border: "none", cursor: "pointer" }}

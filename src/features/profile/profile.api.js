@@ -18,9 +18,8 @@ export async function getUserProfile(token) {
   return data.body; // ex: { firstName, lastName, userName, ... }
 }
 
-/**
- * Met à jour le pseudo de l'utilisateur
- */
+// Met à jour le pseudo de l'utilisateur
+
 export async function updateUserName(token, newUserName) {
   const response = await fetch(`${API_URL}/profile`, {
     method: "PUT",
