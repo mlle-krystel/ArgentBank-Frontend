@@ -1,6 +1,7 @@
-// Sert à gérer l’état du profil utilisateur dans Redux : c’est-à-dire enregistrer le nom, prénom, pseudo, etc., et pouvoir les modifier dans l’interface sans recharger toute la page.
+// src/features/profile/profile.slice.js
 
 import { createSlice } from "@reduxjs/toolkit";
+import { getProfile } from "./usecases/get-profile.usecase.js";
 
 const initialState = {
   firstName: null,
@@ -8,14 +9,13 @@ const initialState = {
   userName: null,
   email: null,
   error: null,
+  loading: false,
 };
 
 const profileSlice = createSlice({
   name: "profile",
   initialState,
   reducers: {
-    //  Enregistre toutes les infos du profil
-
     setProfile(state, action) {
       const { firstName, lastName, userName, email } = action.payload;
       state.firstName = firstName;
@@ -24,21 +24,34 @@ const profileSlice = createSlice({
       state.email = email;
       state.error = null;
     },
-
-    //   Met à jour uniquement le pseudo
-
     updateUserName(state, action) {
       state.userName = action.payload;
     },
-
-    // Enregistre une erreur si besoin
-
     setProfileError(state, action) {
       state.error = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getProfile.fulfilled, (state, action) => {
+        const { firstName, lastName, userName, email } = action.payload;
+        state.firstName = firstName;
+        state.lastName = lastName;
+        state.userName = userName;
+        state.email = email;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(getProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
 });
 
-export const { setProfile, updateUserName, setProfileError } =
-  profileSlice.actions;
+export const { setProfile, updateUserName, setProfileError } = profileSlice.actions;
 export default profileSlice.reducer;

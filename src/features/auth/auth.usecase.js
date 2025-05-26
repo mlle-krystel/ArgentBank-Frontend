@@ -1,25 +1,22 @@
-// TODO async thunk :  thunk, c’est une fonction qui permet de gèrer la connexion utilisateur
+// async thunk : Contient un thunk Redux censé gérer toute la logique de connexion utilisateur
 
 import { loginUser } from "./auth.api";
-import { loginSuccess } from "./auth.slice";
 import { getUserProfile } from "../profile/profile.api";
 import { setProfile } from "../profile/profile.slice";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
-export const login = (email, password) => async (dispatch) => {
-  try {
-    // 1. On récupère le token avec l'email et le mdp
-    const token = await loginUser(email, password);
+// Thunk Redux pour login
+export const login = createAsyncThunk(
+  "auth/login",
+  async ({ email, password }, { dispatch, rejectWithValue }) => {
+    try {
+      const token = await loginUser(email, password);
+      const profile = await getUserProfile(token);
 
-    // 2. On récupère le profil de l’utilisateur avec le token
-    const profileData = await getUserProfile(token);
-
-    // 3. On met à jour le store Redux pour l’auth
-    dispatch(loginSuccess({ token, user: profileData }));
-
-    // 4. Et on met aussi le profil dans son slice dédié
-    dispatch(setProfile(profileData));
-  } catch (error) {
-    console.error("Erreur lors de la connexion :", error.message);
-    // Tu peux aussi ajouter un dispatch d’erreur ici si tu veux
+      dispatch(setProfile(profile));
+      return token; // Ce token sera stocké dans le slice auth
+    } catch (error) {
+      return rejectWithValue(error.message || "Échec de connexion");
+    }
   }
-};
+);

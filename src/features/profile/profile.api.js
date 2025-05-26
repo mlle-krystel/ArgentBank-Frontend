@@ -1,8 +1,8 @@
-// Contient les fonctions d’appel réseau (fetch vers /profile)
+// Centralise les appels API liés au profil utilisateur
+
 const API_URL = "http://localhost:3001/api/v1/user";
 
 // Récupère le profil utilisateur
-
 export async function getUserProfile(token) {
   const response = await fetch(`${API_URL}/profile`, {
     method: "GET",
@@ -19,7 +19,6 @@ export async function getUserProfile(token) {
 }
 
 // Met à jour le pseudo de l'utilisateur
-
 export async function updateUserName(token, newUserName) {
   const response = await fetch(`${API_URL}/profile`, {
     method: "PUT",

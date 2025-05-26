@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateUserNameThunk } from "../features/profile/update-profile.usecase";
-import "../css/main.css";
+import { updateUserNameThunk } from "../../features/profile/usecases/update-profile.usecase";
+import "../../css/UserEditMode.css"; 
 
 function UserEditMode({ setEditMode }) {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
-  const { userName, firstName, lastName } = useSelector((state) => state.profile || {});
+  const { userName, firstName, lastName, loading } = useSelector(
+    (state) => state.profile || {}
+  );
 
   const [newUserName, setNewUserName] = useState(userName || "");
 
-  if (!firstName || !lastName || !userName) {
+  if (loading) {
     return <p>Chargement du profil...</p>;
   }
 
@@ -25,8 +27,9 @@ function UserEditMode({ setEditMode }) {
       <h2 className="edit-title">Edit user info</h2>
       <form className="edit-form" onSubmit={handleSubmit}>
         <div className="input-group">
-          <label>User name:</label>
+          <label htmlFor="userName">User name:</label>
           <input
+            id="userName"
             type="text"
             value={newUserName}
             onChange={(e) => setNewUserName(e.target.value)}
@@ -42,8 +45,14 @@ function UserEditMode({ setEditMode }) {
           <input type="text" value={lastName} disabled />
         </div>
         <div className="button-group">
-          <button type="submit" className="btn-save">Save</button>
-          <button type="button" onClick={() => setEditMode(false)} className="btn-cancel">
+          <button type="submit" className="btn-save">
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={() => setEditMode(false)}
+            className="btn-cancel"
+          >
             Cancel
           </button>
         </div>

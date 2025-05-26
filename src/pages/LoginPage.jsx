@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { login } from "../features/auth/auth.usecase"; // 👈 thunk à appeler
+import { login } from "../features/auth/auth.usecase";
 import "../css/main.css";
 
 function LoginPage() {
@@ -15,10 +15,9 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // 👇 On dispatch notre thunk login(email, password)
-      await dispatch(login(email, password));
-      navigate("/profile"); // Redirige si tout s’est bien passé
-    } catch (err) {
+      await dispatch(login({ email, password })); 
+      navigate("/profile");
+    } catch (error) {
       setError("Email ou mot de passe incorrect");
     }
   };
@@ -31,9 +30,9 @@ function LoginPage() {
 
         <form onSubmit={handleSubmit}>
           <div className="input-wrapper">
-            <label htmlFor="email">Username</label>
+            <label htmlFor="email">Email</label> {/* ✅ Changement du label */}
             <input
-              type="text"
+              type="email"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

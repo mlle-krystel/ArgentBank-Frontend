@@ -1,23 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import "../css/main.css";
-import UserEditMode from "../components/UserEditMode";
+import { useSelector, useDispatch } from "react-redux";
 
-
+import { getProfile } from "../../features/profile/usecases/get-profile.usecase.js";
+import "../../css/main.css";
+import UserEditMode from "./UserEditMode";
 
 function UserProfil() {
-  const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
+  const { firstName, lastName, loading } = useSelector((state) => state.profile);
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
-    if (!token) navigate("/login");
-  }, [navigate, token]);
+    if (!token) {
+      navigate("/login");
+    } else {
+      dispatch(getProfile(token));
+    }
+  }, [dispatch, navigate, token]);
 
-  if (!user) return <p>Chargement...</p>;
+  if (loading) return <p>Chargement...</p>;
+  if (!firstName || !lastName) return <p>Erreur de chargement du profil.</p>;
 
   return (
     <>
@@ -28,7 +35,7 @@ function UserProfil() {
               <h1>
                 Welcome back
                 <br />
-                {user.firstName} {user.lastName}!
+                {firstName} {lastName}!
               </h1>
               <button className="edit-button" onClick={() => setEditMode(true)}>
                 Edit Name
