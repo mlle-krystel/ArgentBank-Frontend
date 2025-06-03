@@ -14,12 +14,18 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await dispatch(login({ email, password })); 
-      navigate("/profile");
-    } catch (error) {
-      setError("Email ou mot de passe incorrect");
-    }
+
+    // Appel de la fonction de connexion
+   const result = await dispatch(login({ email, password }));
+
+  //  Vérifie si la connexion a échoué
+if (login.rejected.match(result)) {
+  setError("Email ou mot de passe incorrect");
+} else {
+  // Redirecte l'utilisateur vers la page de profil si la connexion est réussie
+  navigate("/profile");
+}
+
   };
 
   return (
