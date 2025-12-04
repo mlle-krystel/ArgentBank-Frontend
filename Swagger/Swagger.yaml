@@ -8,6 +8,11 @@ host: localhost:3001
 basePath: /api/v1
 schemes:
   - http
+consumes:
+  - application/json
+produces:
+  - application/json
+
 paths:
   /user/login:
     post:
@@ -22,8 +27,6 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/Login'
-      produces:
-        - application/json
       responses:
         '200':
           description: Login Successfully
@@ -47,8 +50,6 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/User'
-      produces:
-        - application/json
       responses:
         '200':
           description: Signup Successfully
@@ -65,236 +66,136 @@ paths:
         - Bearer: []
       tags:
         - User Module
-      summary: User Profile API
-      description: API for fetching a user profile
-      produces:
-        - application/json
+      summary: Get user profile
+      description: Get authenticated user profile
       responses:
         '200':
-          description: User profile retrieved successfully
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        '400':
-          description: Invalid Fields
-        '500':
-          description: Internal Server Error
-    put:
-      security:
-        - Bearer: []
-      tags:
-        - User Module
-      summary: User Profile API
-      description: API for updating a user profile
-      parameters:
-        - in: body
-          name: body
-          description: Update user profile attributes
-          required: true
+          description: User profile retrieved
           schema:
             $ref: '#/definitions/UserProfile'
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: User profile updated successfully
-          schema:
-            $ref: '#/definitions/ApiResponse'
-        '400':
-          description: Invalid Fields
-        '500':
-          description: Internal Server Error
+        '401':
+          description: Unauthorized
 
-  /transactions/{accountId}:
+# Transactions endpoints from phase 2
+  /transactions:
     get:
+      summary: Get all transactions for the current month
+      description: Returns a list of all transactions grouped by account for the logged-in user.
+      tags:
+        - Transactions
       security:
         - Bearer: []
+      responses:
+        200:
+          description: A list of transactions
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transaction'
+        401:
+          description: Unauthorized
+
+  /transactions/{id}:
+    get:
+      summary: Get transaction details
+      description: Returns detailed information about a specific transaction.
       tags:
-        - Module Transaction
-      summary: User Transaction API
-      description: API for fetching a user's transactions for the current month
+        - Transactions
+      security:
+        - Bearer: []
       parameters:
-        - name: accountId
+        - name: id
           in: path
           required: true
           type: string
-      produces:
-        - application/json
+          description: The transaction ID
       responses:
-        '200':
-          description: User transactions retrieved successfully
-        '400':
-          description: Invalid Fields
-        '500':
-          description: Internal Server Error
+        200:
+          description: Transaction details
+          schema:
+            $ref: '#/definitions/Transaction'
+        404:
+          description: Transaction not found
+        401:
+          description: Unauthorized
 
-    post:
+    put:
+      summary: Update transaction information
+      description: Update editable information for a transaction.
+      tags:
+        - Transactions
       security:
         - Bearer: []
-      tags:
-        - Module Transaction
-      summary: Create a transaction
-      description: Add a new transaction to a user's account
       parameters:
-        - name: accountId
+        - name: id
           in: path
           required: true
           type: string
         - in: body
-          name: transaction
+          name: body
           required: true
           schema:
-            $ref: '#/definitions/NewTransaction'
-      produces:
-        - application/json
+            $ref: '#/definitions/TransactionUpdate'
       responses:
-        '201':
-          description: Transaction created successfully
-        '400':
+        200:
+          description: Transaction updated
+        400:
           description: Invalid input
-        '500':
-          description: Internal Server Error
+        404:
+          description: Transaction not found
 
-  /transactions/{accountId}/{transactionId}:
-    get:
-      security:
-        - Bearer: []
-      tags:
-        - Module Transaction
-      summary: User Transaction Detail API
-      description: API for fetching a specific transaction
-      parameters:
-        - name: accountId
-          in: path
-          required: true
-          type: string
-        - name: transactionId
-          in: path
-          required: true
-          type: string
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: Transaction details retrieved successfully
-          schema:
-            $ref: '#/definitions/Transaction'
-        '400':
-          description: Invalid Fields
-        '500':
-          description: Internal Server Error
-
-    patch:
-      security:
-        - Bearer: []
-      tags:
-        - Module Transaction
-      summary: Edit transaction
-      description: Edit category or note for a transaction
-      parameters:
-        - name: accountId
-          in: path
-          required: true
-          type: string
-        - name: transactionId
-          in: path
-          required: true
-          type: string
-        - name: body
-          in: body
-          required: true
-          schema:
-            type: object
-            properties:
-              category:
-                type: string
-              note:
-                type: string
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: Transaction updated successfully
-        '400':
-          description: Invalid Fields
-        '500':
-          description: Internal Server Error
-
+  /transactions/{id}/info:
     delete:
+      summary: Delete additional transaction info
+      description: Delete extra information attached to a transaction.
+      tags:
+        - Transactions
       security:
         - Bearer: []
-      tags:
-        - Module Transaction
-      summary: Delete note or category
-      description: Remove optional metadata from a transaction (not the transaction itself)
       parameters:
-        - name: accountId
+        - name: id
           in: path
           required: true
           type: string
-        - name: transactionId
-          in: path
-          required: true
-          type: string
-      produces:
-        - application/json
       responses:
-        '204':
-          description: Metadata deleted successfully
-        '400':
-          description: Invalid ID
-        '500':
-          description: Internal Server Error
+        204:
+          description: Info deleted
+        404:
+          description: Transaction not found
 
-securityDefinitions:
-  Bearer:
-    type: apiKey
-    name: Authorization
-    in: header
+    post:
+      summary: Add additional transaction info
+      description: Add extra information (note, category, etc.) to a transaction.
+      tags:
+        - Transactions
+      security:
+        - Bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/TransactionInfo'
+      responses:
+        201:
+          description: Info added
+        400:
+          description: Invalid input
+        404:
+          description: Transaction not found
 
 definitions:
-  User:
-    type: object
-    properties:
-      email:
-        type: string
-        description: user email
-      password:
-        type: string
-        description: user password
-      firstName:
-        type: string
-        description: user first name
-      lastName:
-        type: string
-        description: user last name
-      userName:
-        type: string
-        description: user public name
-
   Login:
     type: object
     properties:
       email:
         type: string
-        description: user email
       password:
         type: string
-        description: user password
-
-  ApiResponse:
-    type: object
-    properties:
-      status:
-        type: integer
-      message:
-        type: string
-      body:
-        type: object
-        properties:
-          id:
-            type: string
-          email:
-            type: string
 
   LoginResponse:
     type: object
@@ -302,38 +203,76 @@ definitions:
       token:
         type: string
 
+  User:
+    type: object
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      userName:
+        type: string
+
+  ApiResponse:
+    type: object
+    properties:
+      message:
+        type: string
+
   UserProfile:
     type: object
     properties:
+      id:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
       userName:
         type: string
 
   Transaction:
     type: object
     properties:
+      id:
+        type: string
+      accountId:
+        type: string
       date:
+        type: string
+        format: date
+      amount:
+        type: number
+        format: float
+      type:
         type: string
       description:
         type: string
-      amount:
-        type: number
-      balance:
-        type: number
-
-  NewTransaction:
-    type: object
-    properties:
-      date:
-        type: string
-        example: "2025-06-10"
-      description:
-        type: string
-      amount:
-        type: number
-        example: 250.50
       category:
         type: string
-        example: "Food"
-      note:
+      notes:
         type: string
-        example: "Lunch with client"
+
+  TransactionUpdate:
+    type: object
+    properties:
+      description:
+        type: string
+      category:
+        type: string
+      notes:
+        type: string
+
+  TransactionInfo:
+    type: object
+    properties:
+      category:
+        type: string
+      notes:
+        type: string
+
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
