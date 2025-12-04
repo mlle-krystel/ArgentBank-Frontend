@@ -6,7 +6,7 @@ import React, { Suspense } from "react";
 const Layout = React.lazy(() => import("./layout/Layout"));
 const Home = React.lazy(() => import("./pages/Home"));
 const LoginPage = React.lazy(() => import("./pages/LoginPage"));
-const UserProfil = React.lazy(() => import("./pages/user-profil/UserProfil"));
+const UserProfil = React.lazy(() => import("./pages/user-profile/UserProfil"));
 
 
 function App() {

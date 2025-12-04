@@ -127,6 +127,33 @@ paths:
         '500':
           description: Internal Server Error
 
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - Module Transaction
+      summary: Create a transaction
+      description: Add a new transaction to a user's account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          type: string
+        - in: body
+          name: transaction
+          required: true
+          schema:
+            $ref: '#/definitions/NewTransaction'
+      produces:
+        - application/json
+      responses:
+        '201':
+          description: Transaction created successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Internal Server Error
+
   /transactions/{accountId}/{transactionId}:
     get:
       security:
@@ -189,6 +216,32 @@ paths:
           description: Transaction updated successfully
         '400':
           description: Invalid Fields
+        '500':
+          description: Internal Server Error
+
+    delete:
+      security:
+        - Bearer: []
+      tags:
+        - Module Transaction
+      summary: Delete note or category
+      description: Remove optional metadata from a transaction (not the transaction itself)
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          type: string
+        - name: transactionId
+          in: path
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        '204':
+          description: Metadata deleted successfully
+        '400':
+          description: Invalid ID
         '500':
           description: Internal Server Error
 
@@ -266,3 +319,21 @@ definitions:
         type: number
       balance:
         type: number
+
+  NewTransaction:
+    type: object
+    properties:
+      date:
+        type: string
+        example: "2025-06-10"
+      description:
+        type: string
+      amount:
+        type: number
+        example: 250.50
+      category:
+        type: string
+        example: "Food"
+      note:
+        type: string
+        example: "Lunch with client"

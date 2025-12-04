@@ -17,6 +17,11 @@ body {
   flex: 1;
 }
 
+.main-nav-item i {
+  margin-right: 8px; 
+}
+
+
 .bg-dark {
   background-color: #12002b;
 }
@@ -275,6 +280,7 @@ body {
   background-color: #00bc77;
   color: #fff;
 }
+
 
 @media (min-width: 720px) {
   .account {
