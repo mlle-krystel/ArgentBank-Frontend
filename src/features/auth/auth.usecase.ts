@@ -16,7 +16,7 @@ type LoginResult = string;
 // Code pour javaScript : export const login = createAsyncThunk(
 
 // Thunk Redux Toolkit typé pour la connexion utilisateur : retourne une string (le token), et prend un objet LoginUtilisateur en argument
-export const login = createAsyncThunk<LoginResult, LoginUtilisateur>(
+export const login = createAsyncThunk<LoginResult, LoginUtilisateur, {rejectValue: string}>(
   "auth/login", // nom de l'action, utilisé dans le slice
   async ({ email, password }, { rejectWithValue }) => {
     try {

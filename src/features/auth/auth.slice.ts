@@ -17,11 +17,13 @@ const initialState: AuthState = {
   loading: false,
 };
 
-// Création du slice Redux typé
+// Création du slice Redux dédié à la gestion de l’authentification
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+
+    // Action pour déconnecter l’utilisateur 
     logout(state) {
       state.token = null;
       state.error = null;
@@ -30,6 +32,8 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+
+    // démarrage de la connexion : on active le chargement et réinitialise les erreurs
       .addCase(login.pending, (state) => {
         state.loading = true;
         state.error = null;

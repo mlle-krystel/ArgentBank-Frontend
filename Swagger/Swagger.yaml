@@ -1,194 +1,264 @@
 swagger: '2.0'
 info:
   title: Bank Argent API documentation
-  description: Contains all available API endpoints in this codebase
+  description: Contient tous les endpoints disponibles dans cette application
   version: '1.0.0'
   termsOfService: 'http://swagger.io/terms/'
+
 host: localhost:3001
 basePath: /api/v1
 schemes:
   - http
-consumes:
-  - application/json
-produces:
-  - application/json
 
 paths:
+  # Endpoint pour connecter un utilisateur (authentification par email/mot de passe)
   /user/login:
     post:
       tags:
         - User Module
       summary: Login
-      description: API for Login
+      description: API pour authentifier un utilisateur
       parameters:
         - in: body
           name: body
-          description: Login Payload
+          description: Identifiants de connexion
           required: true
           schema:
             $ref: '#/definitions/Login'
+      produces:
+        - application/json
       responses:
         '200':
-          description: Login Successfully
+          description: Connexion réussie
           schema:
             $ref: '#/definitions/LoginResponse'
         '400':
-          description: Invalid Fields
+          description: Champs invalides
         '500':
-          description: Internal Server Error
+          description: Erreur serveur
 
+  # Endpoint pour inscrire un nouvel utilisateur
   /user/signup:
     post:
       tags:
         - User Module
       summary: Signup
-      description: API for Signup
+      description: API pour créer un compte utilisateur
       parameters:
         - in: body
           name: body
-          description: Signup Payload
+          description: Données d'inscription
           required: true
           schema:
             $ref: '#/definitions/User'
+      produces:
+        - application/json
       responses:
         '200':
-          description: Signup Successfully
+          description: Inscription réussie
           schema:
             $ref: '#/definitions/ApiResponse'
         '400':
-          description: Invalid Fields
+          description: Champs invalides
         '500':
-          description: Internal Server Error
+          description: Erreur serveur
 
+  # Endpoints pour gérer le profil utilisateur :
   /user/profile:
+  # Get pour récupérer le profil utilisateur
     get:
       security:
         - Bearer: []
       tags:
         - User Module
-      summary: Get user profile
-      description: Get authenticated user profile
+      summary: Récupérer le profil utilisateur
+      description: Récupère les infos du profil connecté
+      produces:
+        - application/json
       responses:
         '200':
-          description: User profile retrieved
+          description: Profil récupéré
           schema:
-            $ref: '#/definitions/UserProfile'
-        '401':
-          description: Unauthorized
-
-# Transactions endpoints from phase 2
-  /transactions:
-    get:
-      summary: Get all transactions for the current month
-      description: Returns a list of all transactions grouped by account for the logged-in user.
-      tags:
-        - Transactions
+            $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Champs invalides
+        '500':
+          description: Erreur serveur
+# Put pour mettre à jour le profil de l’utilisateur (le nom d’utilisateur)
+    put:
       security:
         - Bearer: []
+      tags:
+        - User Module
+      summary: Modifier le profil utilisateur
+      description: Permet de modifier le nom d'utilisateur
+      parameters:
+        - in: body
+          name: body
+          description: Nouvel attribut userName
+          required: true
+          schema:
+            $ref: '#/definitions/UserProfile'
+      produces:
+        - application/json
       responses:
-        200:
-          description: A list of transactions
+        '200':
+          description: Profil mis à jour
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Champs invalides
+        '500':
+          description: Erreur serveur
+
+  # Endpoints pour les transactions d’un compte utilisateur
+  /transactions/{accountId}:
+  # Get pour récupérer les transactions du compte pour le mois en cours
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - Module Transaction
+      summary: Récupérer les transactions du compte
+      description: Retourne toutes les transactions du mois courant pour un compte utilisateur
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Transactions récupérées avec succès
           schema:
             type: array
             items:
               $ref: '#/definitions/Transaction'
-        401:
-          description: Unauthorized
+        '400':
+          description: Requête invalide
+        '500':
+          description: Erreur serveur
 
-  /transactions/{id}:
+  # Endpoints pour une transaction spécifique
+  /transactions/{accountId}/{transactionId}:
+  # Get pour récupérer les détails d’une transaction spécifique
     get:
-      summary: Get transaction details
-      description: Returns detailed information about a specific transaction.
-      tags:
-        - Transactions
       security:
         - Bearer: []
+      tags:
+        - Module Transaction
+      summary: Détails d'une transaction
+      description: Retourne les détails d'une transaction spécifique
       parameters:
-        - name: id
+        - name: accountId
           in: path
           required: true
           type: string
-          description: The transaction ID
+        - name: transactionId
+          in: path
+          required: true
+          type: string
+      produces:
+        - application/json
       responses:
-        200:
-          description: Transaction details
+        '200':
+          description: Détails de la transaction
           schema:
             $ref: '#/definitions/Transaction'
-        404:
-          description: Transaction not found
-        401:
-          description: Unauthorized
-
-    put:
-      summary: Update transaction information
-      description: Update editable information for a transaction.
-      tags:
-        - Transactions
+        '400':
+          description: Requête invalide
+        '500':
+          description: Erreur serveur
+# Patch pour modifier la catégorie ou la note d’une transaction
+    patch:
       security:
         - Bearer: []
+      tags:
+        - Module Transaction
+      summary: Modifier catégorie ou note
+      description: Permet de modifier les métadonnées de la transaction (catégorie ou note)
       parameters:
-        - name: id
+        - name: accountId
           in: path
           required: true
           type: string
-        - in: body
-          name: body
+        - name: transactionId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
           required: true
           schema:
-            $ref: '#/definitions/TransactionUpdate'
+            type: object
+            properties:
+              category:
+                type: string
+              note:
+                type: string
+      produces:
+        - application/json
       responses:
-        200:
-          description: Transaction updated
-        400:
-          description: Invalid input
-        404:
-          description: Transaction not found
-
-  /transactions/{id}/info:
+        '200':
+          description: Transaction modifiée
+        '400':
+          description: Requête invalide
+        '500':
+          description: Erreur serveur
+# Delete pour supprimer la catégorie ou la note d’une transaction
     delete:
-      summary: Delete additional transaction info
-      description: Delete extra information attached to a transaction.
-      tags:
-        - Transactions
       security:
         - Bearer: []
+      tags:
+        - Module Transaction
+      summary: Supprimer catégorie ou note
+      description: Supprime les métadonnées d'une transaction (pas la transaction)
       parameters:
-        - name: id
+        - name: accountId
           in: path
           required: true
           type: string
-      responses:
-        204:
-          description: Info deleted
-        404:
-          description: Transaction not found
-
-    post:
-      summary: Add additional transaction info
-      description: Add extra information (note, category, etc.) to a transaction.
-      tags:
-        - Transactions
-      security:
-        - Bearer: []
-      parameters:
-        - name: id
+        - name: transactionId
           in: path
           required: true
           type: string
-        - in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/TransactionInfo'
+      produces:
+        - application/json
       responses:
-        201:
-          description: Info added
-        400:
-          description: Invalid input
-        404:
-          description: Transaction not found
-
+        '204':
+          description: Métadonnées supprimées
+        '400':
+          description: ID invalide
+        '500':
+          description: Erreur serveur
+# Modeles de sécurité pour l'authentification par token Bearer
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+# Modèles de données utilisés dans l'API
 definitions:
+  User:
+    type: object
+    properties:
+      email:
+        type: string
+        description: Email utilisateur
+      password:
+        type: string
+        description: Mot de passe utilisateur
+      firstName:
+        type: string
+        description: Prénom
+      lastName:
+        type: string
+        description: Nom
+      userName:
+        type: string
+        description: Nom d'utilisateur public
+# Modèle pour les données de connexion
   Login:
     type: object
     properties:
@@ -196,83 +266,46 @@ definitions:
         type: string
       password:
         type: string
-
+# Modèle général de réponse API
+  ApiResponse:
+    type: object
+    properties:
+      status:
+        type: integer
+      message:
+        type: string
+      body:
+        type: object
+        properties:
+          id:
+            type: string
+          email:
+            type: string
+# Modèle pour l'utilisateur lors de la connexion
   LoginResponse:
     type: object
     properties:
       token:
         type: string
-
-  User:
-    type: object
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-      userName:
-        type: string
-
-  ApiResponse:
-    type: object
-    properties:
-      message:
-        type: string
-
+# Modèle pour la mise à jour du profil utilisateur
   UserProfile:
     type: object
     properties:
-      id:
-        type: string
-      firstName:
-        type: string
-      lastName:
-        type: string
       userName:
         type: string
-
+# Modèle pour une transaction bancaire
   Transaction:
     type: object
     properties:
-      id:
-        type: string
-      accountId:
-        type: string
       date:
         type: string
-        format: date
+      description:
+        type: string
       amount:
         type: number
-        format: float
-      type:
-        type: string
-      description:
-        type: string
+      balance:
+        type: number
       category:
         type: string
-      notes:
+      note:
         type: string
-
-  TransactionUpdate:
-    type: object
-    properties:
-      description:
-        type: string
-      category:
-        type: string
-      notes:
-        type: string
-
-  TransactionInfo:
-    type: object
-    properties:
-      category:
-        type: string
-      notes:
-        type: string
-
-securityDefinitions:
-  Bearer:
-    type: apiKey
-    name: Authorization
-    in: header

@@ -59,7 +59,8 @@ function UserEditMode({ setEditMode }: UserEditModeProps) {
         <div className="input-group">
           <label>Last name:</label>
 
-          <input type="text" value={firstName || ""} disabled />
+          <input type="text" value={lastName || ""} disabled />
+
         </div>
 
         {error && <p style={{ color: "red", marginTop: "1rem" }}>{error}</p>}

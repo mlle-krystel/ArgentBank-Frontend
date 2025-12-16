@@ -29,6 +29,11 @@ export const updateProfile = createAsyncThunk<
   async ({ newUserName }, { rejectWithValue, getState }) => {
     const token = getState().auth.token;
 
+    // Vérifie si le token est présent
+     if (!token) {
+      return rejectWithValue("Veuillez vous reconnecter");
+    }
+
     try {
       const data = await updateUserName(token!, newUserName);
 
