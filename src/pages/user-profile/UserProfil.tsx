@@ -19,7 +19,8 @@ function UserProfil() {
 
   useEffect(() => {
   if (!token) {
-    navigate("/login");
+    // Redirige vers la page d'accueil si pas de token
+     navigate("/", { replace: true });
     return;
   }
   dispatch(getProfile(token));

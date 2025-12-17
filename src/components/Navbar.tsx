@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../features/auth/auth.slice";
 import type { RootState, AppDispatch } from "../store/store";
 
-import logo from "/images/argentBankLogo.png";
+import logo from "/images/argentBankLogo.webp";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -34,9 +34,10 @@ function Navbar() {
       <div>
         {isAuthenticated ? (
           <>
-            <span className="main-nav-item">
-              <i className="fa fa-user-circle"></i> {userName}
-            </span>
+           <Link to="/profile" className="main-nav-item">
+  <i className="fa fa-user-circle"></i> {userName}
+</Link>
+
             <button
               onClick={handleLogout}
               className="main-nav-item"
